@@ -27,13 +27,17 @@ import os
 from tensorflow import keras
 from sklearn.preprocessing import StandardScaler
 
-#CHAPTER: FUNCS
+#/---------------------------Chapter: Defining model functions------------------/
 
 def encoder(input_window):
-    x = Conv1D(16, 3, activation="relu", padding="same")(input_window) # 10 dims
+    x = Conv1D(32, 5, activation="relu", padding="same")(input_window) # 20 dims
     #x = BatchNormalization()(x)
-    x = MaxPooling1D(2, padding="same")(x) # 5 dims
-    x = Conv1D(1, 3, activation="relu", padding="same")(x) # 5 dims
+    x = MaxPooling1D(2, padding="same")(x) # 10 dims
+    
+    #x = Conv1D(32, 5, activation="relu", padding="same")(x) # 10 dims
+    #x = MaxPooling1D(3, padding="same")(x) # 5 dims
+
+    x = Conv1D(1, 5, activation="relu", padding="same")(x) # 5 dims
     #x = BatchNormalization()(x)
     encoded = MaxPooling1D(2, padding="same")(x) # 3 dims
 
@@ -42,24 +46,30 @@ def encoder(input_window):
 
 def decoder(encoded):
     #decoder
-    x = Conv1D(1, 3, activation="relu", padding="same")(encoded) # 3 dims
-    #x = BatchNormalization()(x)
-    x = UpSampling1D(2)(x) # 6 dims
-    x = Conv1D(16, 2, activation='relu')(x) # 5 dims
+    
+    x = UpSampling1D(2)(encoded) # 6 dims
+    x = Conv1D(32, 5, activation="relu", padding="same")(x) # 3 dims
+    #x = BatchNormalzation()(x)
+    #x = UpSampling1D(3)(x) # 6 dims
+    
+    #x = Conv1D(32, 5, activation='relu')(x) # 5 dims
     #x = BatchNormalization()(x)
     x = UpSampling1D(2)(x) # 10 dims
-    decoded = Conv1D(1, 3, activation='sigmoid', padding='same')(x) # 10 dims
+    
+    #x = Conv1D(32, 5, activation='relu')(x) # 20 dims
+
+    decoded = Conv1D(1, 5, activation='sigmoid', padding='same')(x) # 10 dims
     
     return decoded
 
 
-#CHAPTER: PARAMS
+#/------------------------Chapter: Parameter setup------------------/
 
 dataset_path = ''
 queryset_path = ''
 output_dataset_path = ''
 output_queryset_path = ''
-window_length = 10
+window_length = 20
 predict = False
 
 input_args = sys.argv
@@ -72,19 +82,31 @@ for i in range(1, len(input_args)):
         output_dataset_path = input_args[i+1]
     if input_args[i] == '-oq':
         output_queryset_path = input_args[i+1]
-    if input_args[i] == '-window':
-        window_length = int(input_args[i+1])
+    #if input_args[i] == '-window':
+    #    window_length = int(input_args[i+1])
     if input_args[i] == '-predict':
         predict = True
 
+if dataset_path == '':
+    print('You must specify a dataset')
+    sys.exit()
+
+if queryset_path == '':
+    print('You must specify a query set')
+    sys.exit()
+
+if output_dataset_path == '':
+    print('You must specify a reduced dataset path')
+    sys.exit()
+
+if output_queryset_path == '':
+    print('You must specify a reduced query path')
+    sys.exit()
+
+#/------------------------Chapter: Train/Test split-------------------------/
 
 df = pd.read_csv(dataset_path, '\t', header=None)
 qf = pd.read_csv(queryset_path, '\t', header=None)
-
-#training_set_temp = training_set_temp.astype('float32')
-#test_set_temp = test_set_temp.astype('float32')
-
-#CHAPTER: SPLITS
 
 split_num = int((0.8 * (df.shape[1]-1)))
 
@@ -100,10 +122,7 @@ for i in range(qf.shape[0]):
     training_sets.append(qf.iloc[i , 1:split_num2+1].values)
     test_sets.append(qf.iloc[i , split_num2+1: ].values)
 
-#CHAPTER: FEATURES
-
-#training_set_big = np.reshape(training_set_big, (-1,1)) 
-#test_set_big = np.reshape(test_set_big, (-1,1)) 
+#/-----------------------Chapter: Defining feature arrays----------------------/
 
 scalers = []
 
@@ -160,10 +179,7 @@ X_train_big = np.array(X_train_big)
 
 X_test_big = [item for sublist in X_tests for item in sublist]
 
-#CHAPTER: FIT
-
-encoding_dim = 3
-epochs = 1
+#/--------------------Chapter: Model definition and training/predicting---------/
 
 input_window = Input(shape=(window_length,1))
 #print(input_window)
@@ -176,14 +192,14 @@ if predict == False:
 
     for (train,test) in zip(X_trains,X_tests):
         history = autoencoder.fit(train, train,
-                        epochs=epochs,
-                        batch_size=64,
+                        epochs=5,
+                        batch_size=128,
                         shuffle=True,
-                        validation_data=(test, test))
+                        validation_split=0.1)   
 
     autoencoder.save('reduce_model.h5')
     mae_t = np.mean(history.history['val_loss'])
-    print(mae_t)
+    print("The average loss of the validation sets is ", mae_t)
 
 autoencoder = tf.keras.models.load_model('reduce_model.h5')
 
@@ -197,11 +213,9 @@ for test in X_tests:
     test_losses.append(loss)
 
 mae_t = np.mean(np.array(test_losses)) 
-print(mae_t)
+print("The average loss of the test sets is ", mae_t)
 
-#CHAPTER: WRITE NEW DIMS
-#mae_t = np.mean(autoencoder.history['val_loss'])
-#print(mae_t)
+#/---------------------Chapter: Writing out reduced dimension files------------/
 
 dataset_prices = []
 dataset_names = []
@@ -264,6 +278,9 @@ for sett in query_prices:
     #print(X_test.shape)
     X_queries.append(X_test)
 
+columns = 0
+latent_dim = 0
+
 with open(output_dataset_path, 'w', encoding='UTF8') as f:
 
     for (name, dset, sc) in zip(dataset_names, X_datasets, dataset_scalers):
@@ -277,6 +294,9 @@ with open(output_dataset_path, 'w', encoding='UTF8') as f:
 
         i = 0
         encoded_stock = encoder.predict(dset)
+        columns = df.shape[1]-1
+        latent_dim = encoded_stock[0].shape[0]
+
         for iterator in range(len(encoded_stock)):
             #print(iterator)
             slc = sc.inverse_transform(encoded_stock[iterator])
@@ -291,7 +311,7 @@ with open(output_dataset_path, 'w', encoding='UTF8') as f:
         row_str.append(id)
         for j in reduced_stock:
             row_str.append(j)
-        #print("END")
+        
         writer = csv.writer(f)
         writer.writerow(row_str) 
 
@@ -317,8 +337,9 @@ with open(output_queryset_path, 'w', encoding='UTF8') as f:
         row_str.append(id)
         for j in reduced_stock:
             row_str.append(j)
-        #print("END")
+        
         writer = csv.writer(f)
         writer.writerow(row_str) 
 
-
+#print(latent_dim)
+print('Reduced columns are: ' + str( int(columns/window_length) * latent_dim) )
