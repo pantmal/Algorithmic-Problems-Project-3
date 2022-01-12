@@ -22,12 +22,12 @@ from sklearn.preprocessing import StandardScaler
 
 #/------------------------Chapter: Parameter setup------------------/
 
-n = 10
+n = 1
 total = False
 graphs_all = False
 predict = False
-time_steps = 50#TODO
-graphs_n = 5 #TODO: Decide on this
+time_steps = 50
+graphs_n = 1 
 dataset = ''
 
 input_args = sys.argv
@@ -42,15 +42,15 @@ for i in range(1, len(input_args)):
         graphs_all = True
     if input_args[i] == '-predict':
         predict = True
-    if input_args[i] == '-lookback':
-        time_steps = int(input_args[i+1])
     if input_args[i] == '-graphs_n':
         graphs_all = True
         graphs_n = int(input_args[i+1])
 
-    
+if graphs_all == True:
+    graphs_n = n
+
 if dataset == '':
-    print('You must specify a dataset')
+    print('You must specify a dataset.')
     sys.exit()
 
 if graphs_n > n:
@@ -61,12 +61,10 @@ if graphs_n > n:
 
 df = pd.read_csv(dataset, '\t', header=None)
 
-#print("Number of rows and columns:", df.shape)
-
 df_rand = random.sample(range(df.shape[0]), n) 
 
 split_num = int((0.8 * (df.shape[1]-1)))
-#print(split_num)
+
 training_sets = []
 test_sets = []
 input_sets = []
@@ -81,15 +79,13 @@ for i in df_rand:
     test_sets.append(test_set)
 
     input_sets.append(df.iloc[i, 0+(df.shape[1] - len(test_set) - time_steps) :].values) 
-    #print(len(input_sets[i]))
+
 
 if total == True:
    for i in range(df.shape[0]):
        training_sets.append(df.iloc[i , 1:split_num+1].values)
     
 
-#training_set_big = [item for sublist in training_sets for item in sublist]
-#test_set_big = [item for sublist in test_sets for item in sublist]
 
 #/-----------------------Chapter: Defining feature arrays----------------------/
 
@@ -100,9 +96,9 @@ y_trains = []
 for sett in training_sets:
     
     sc = StandardScaler()
-
+    # Creating a data structure with 60 time-steps and 1 output
     training_set_scaled = np.reshape(sett, (-1,1)) 
-    training_set_scaled = sc.fit_transform(training_set_scaled)# Creating a data structure with 60 time-steps and 1 output
+    training_set_scaled = sc.fit_transform(training_set_scaled)
 
     scalers.append(sc)
 
@@ -115,6 +111,7 @@ for sett in training_sets:
     X_train, y_train = np.array(X_train), np.array(y_train)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
     #print(X_train.shape)
+    
     X_trains.append(X_train)
     y_trains.append(y_train)
 
@@ -129,10 +126,11 @@ for (sett, sc) in zip(input_sets,scalers):
     X_test = []
     for i in range(len(inputs) - time_steps):
         X_test.append(inputs[i:(i+time_steps)])
-        #X_test.append(inputs[i-60:i, 0])
+        
     X_test = np.array(X_test)
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
     #print(X_test.shape)
+    
     X_tests.append(X_test)
 
 X_train_big = [item for sublist in X_trains for item in sublist]
@@ -181,10 +179,6 @@ else:
         model = Sequential()#Adding the first LSTM layer and some Dropout regularisation
         model.add(LSTM(units = 64, return_sequences = True, input_shape = (X_train_big.shape[1], 1)))
         model.add(Dropout(0.5))# Adding a second LSTM layer and some Dropout regularisation
-        #model.add(LSTM(units = 64, return_sequences = True))
-        #model.add(Dropout(0.2))# Adding a third LSTM layer and some Dropout regularisation
-        #model.add(LSTM(units = 64, return_sequences = True))
-        #model.add(Dropout(0.2))# Adding a fourth LSTM layer and some Dropout regularisation
         model.add(LSTM(units = 64))
         model.add(Dropout(0.5))# Adding the output layer
         model.add(Dense(units = 1))
@@ -205,15 +199,10 @@ else:
 
         pred_prices.append(pred_price)
     
+if predict == False:
+    print("The average loss of the validation sets is ", np.mean(val_losses))
 
-print("The average loss of the validation sets is ", np.mean(val_losses))
 print("The average loss of the test sets is ", np.mean(test_losses))
-#print(len(pred_prices))
-#print(X_test.shape)
-# (459, 60, 1)
-
-#predicted_stock_price = model.predict(X_test)
-#predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
 #/------------------------------Chapter: Graphs-------------------------------/
 
@@ -226,7 +215,7 @@ if graphs_all == False:
     plt.figure()
     plt.plot(range(split_num,df.shape[1]-1),test_sets[random_stock], color = 'red', label = 'True ' + name)
     plt.plot(range(split_num,df.shape[1]-1),pred_prices[random_stock], color = 'blue', label = 'Predicted ' + name)
-    plt.xticks(np.arange(split_num,df.shape[1]-1,time_steps*10))
+    plt.xticks(np.arange(split_num,df.shape[1]-1,time_steps*2))
     plt.title(name + ' Prediction')
     plt.xlabel('Time values')
     plt.ylabel(name)
@@ -241,7 +230,7 @@ else:
         plt.figure()    
         plt.plot(range(split_num,df.shape[1]-1),test_sets[stock], color = 'red', label = 'True ' + name)
         plt.plot(range(split_num,df.shape[1]-1),pred_prices[stock], color = 'blue', label = 'Predicted ' + name)
-        plt.xticks(np.arange(split_num,df.shape[1]-1,time_steps*10))
+        plt.xticks(np.arange(split_num,df.shape[1]-1,time_steps*2))
         plt.title(name + ' Prediction')
         plt.xlabel('Time values')
         plt.ylabel(name)

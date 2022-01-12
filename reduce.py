@@ -31,29 +31,24 @@ from sklearn.preprocessing import StandardScaler
 
 def encoder(input_window):
     x = Conv1D(32, 5, activation="relu", padding="same")(input_window) # 20 dims
-    #x = BatchNormalization()(x)
     x = MaxPooling1D(2, padding="same")(x) # 10 dims
     
     #x = Conv1D(32, 5, activation="relu", padding="same")(x) # 10 dims
     #x = MaxPooling1D(3, padding="same")(x) # 5 dims
 
     x = Conv1D(1, 5, activation="relu", padding="same")(x) # 5 dims
-    #x = BatchNormalization()(x)
     encoded = MaxPooling1D(2, padding="same")(x) # 3 dims
 
     return encoded
 
 
 def decoder(encoded):
-    #decoder
     
     x = UpSampling1D(2)(encoded) # 6 dims
     x = Conv1D(32, 5, activation="relu", padding="same")(x) # 3 dims
-    #x = BatchNormalzation()(x)
     #x = UpSampling1D(3)(x) # 6 dims
     
     #x = Conv1D(32, 5, activation='relu')(x) # 5 dims
-    #x = BatchNormalization()(x)
     x = UpSampling1D(2)(x) # 10 dims
     
     #x = Conv1D(32, 5, activation='relu')(x) # 20 dims
@@ -82,8 +77,6 @@ for i in range(1, len(input_args)):
         output_dataset_path = input_args[i+1]
     if input_args[i] == '-oq':
         output_queryset_path = input_args[i+1]
-    #if input_args[i] == '-window':
-    #    window_length = int(input_args[i+1])
     if input_args[i] == '-predict':
         predict = True
 
@@ -132,15 +125,14 @@ for sett in training_sets:
     training_set_scaled = np.asarray(training_set_scaled).astype('float32')
 
     sc = MinMaxScaler(feature_range = (0, 1))
-
-    training_set_scaled = sc.fit_transform(training_set_scaled)# Creating a data structure with 60 time-steps and 1 output
+    # Creating a data structure with 60 time-steps and 1 output
+    training_set_scaled = sc.fit_transform(training_set_scaled)
 
     scalers.append(sc)
 
     X_train = []
     y_train = []
     
-    #slices = [training_set_scaled[i:i + window_length] for i in range(0, len(training_set_scaled), window_length)]
     for i in range(0, len(training_set_scaled), window_length):
         X_train.append(training_set_scaled[i:(i + window_length)])
     
@@ -150,6 +142,7 @@ for sett in training_sets:
     X_train, y_train = np.array(X_train), np.array(y_train)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
     #print(X_train.shape)
+
     X_trains.append(X_train)
 
 
@@ -158,7 +151,7 @@ for (sett,sc) in zip(test_sets,scalers):
     test_set_scaled = np.reshape(sett, (-1,1)) 
     test_set_scaled = np.asarray(test_set_scaled).astype('float32')
 
-    test_set_scaled = sc.transform(test_set_scaled)# Creating a data structure with 60 time-steps and 1 output
+    test_set_scaled = sc.transform(test_set_scaled)
     X_test = []
     y_test = []
     for i in range(0, len(test_set_scaled), window_length):
@@ -169,20 +162,18 @@ for (sett,sc) in zip(test_sets,scalers):
 
     X_test, y_test = np.array(X_test), np.array(y_test)
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-    #print(X_train.shape)
+    #print(X_test.shape)
+
     X_tests.append(X_test)
 
 X_train_big = [item for sublist in X_trains for item in sublist]
-#y_train_big = [item for sublist in y_trains for item in sublist]
 X_train_big = np.array(X_train_big)
-#y_train_big = np.array(y_train_big)
 
 X_test_big = [item for sublist in X_tests for item in sublist]
 
 #/--------------------Chapter: Model definition and training/predicting---------/
 
 input_window = Input(shape=(window_length,1))
-#print(input_window)
 encoder = Model(input_window, encoder(input_window))
 autoencoder = Model(input_window, decoder(encoder(input_window)))
 autoencoder.compile(loss='mean_squared_error', optimizer = 'adam')
@@ -191,20 +182,13 @@ autoencoder.summary()
 if predict == False:
 
     for (train,test) in zip(X_trains,X_tests):
-        history = autoencoder.fit(train, train,
-                        epochs=5,
-                        batch_size=128,
-                        shuffle=True,
-                        validation_split=0.1)   
+        history = autoencoder.fit(train, train,epochs=5,batch_size=128,shuffle=True,validation_split=0.1)   
 
     autoencoder.save('reduce_model.h5')
     mae_t = np.mean(history.history['val_loss'])
     print("The average loss of the validation sets is ", mae_t)
 
 autoencoder = tf.keras.models.load_model('reduce_model.h5')
-
-#half_size = len(X_tests)/2
-#rand = random.sample(range(df.shape[0]), half_size) 
 
 test_losses = []
 for test in X_tests:
@@ -237,10 +221,9 @@ for sett in dataset_prices:
 
     sc = MinMaxScaler(feature_range = (0, 1))
 
-    training_set_scaled = sc.fit_transform(training_set_scaled)#Creating a data structure with 60 time-steps and 1 output
+    training_set_scaled = sc.fit_transform(training_set_scaled)
     dataset_scalers.append(sc)
-    #training_set_scaled = sett
-    #training_set_scaled = np.asarray(training_set_scaled).astype('float32')
+    
     X_train = []
     for i in range(0, len(training_set_scaled), window_length):
         X_train.append(training_set_scaled[i:(i + window_length)])
@@ -251,6 +234,7 @@ for sett in dataset_prices:
     X_train = np.array(X_train)
     X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
     #print(X_train.shape)
+
     X_datasets.append(X_train)
 
 query_scalers = []
@@ -262,9 +246,8 @@ for sett in query_prices:
     test_set_scaled = np.reshape(sett, (-1,1)) 
     test_set_scaled = np.asarray(test_set_scaled).astype('float32')
     
-    test_set_scaled = sc.fit_transform(test_set_scaled)# Creating a data structure with 60 time-steps and 1 output
+    test_set_scaled = sc.fit_transform(test_set_scaled)
     query_scalers.append(sc)
-    #test_set_scaled = sett
     
     X_test = []
     for i in range(0, len(test_set_scaled), window_length):
@@ -276,6 +259,7 @@ for sett in query_prices:
     X_test = np.array(X_test)
     X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
     #print(X_test.shape)
+
     X_queries.append(X_test)
 
 columns = 0
@@ -285,11 +269,6 @@ with open(output_dataset_path, 'w', encoding='UTF8') as f:
 
     for (name, dset, sc) in zip(dataset_names, X_datasets, dataset_scalers):
 
-        #encoded_stocks = encoder.predict(X_test)
-        #print(sc.inverse_transform(encoded_stocks[200]))
-        #print(sc.inverse_transform(X_test[200]))
-        #print(encoded_stocks.shape)
-
         reduced_stock = []
 
         i = 0
@@ -298,13 +277,11 @@ with open(output_dataset_path, 'w', encoding='UTF8') as f:
         latent_dim = encoded_stock[0].shape[0]
 
         for iterator in range(len(encoded_stock)):
-            #print(iterator)
             slc = sc.inverse_transform(encoded_stock[iterator])
             for item in slc:
                 reduced_stock.append(item)
     
         reduced_stock = [item for sublist in reduced_stock for item in sublist]
-        #print(reduced_stock)
         
         row_str = []
         id = name
@@ -324,7 +301,6 @@ with open(output_queryset_path, 'w', encoding='UTF8') as f:
         i = 0
         encoded_stock = encoder.predict(query)
         for iterator in range(len(encoded_stock)):
-            #print(iterator)
             slc = sc.inverse_transform(encoded_stock[iterator])
             
             for item in slc:
@@ -341,5 +317,4 @@ with open(output_queryset_path, 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
         writer.writerow(row_str) 
 
-#print(latent_dim)
-print('Reduced columns are: ' + str( int(columns/window_length) * latent_dim) )
+print('The number of reduced columns will be: ' + str( int(columns/window_length) * latent_dim) )
