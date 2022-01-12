@@ -30,30 +30,23 @@ from sklearn.preprocessing import StandardScaler
 #/---------------------------Chapter: Defining model functions------------------/
 
 def encoder(input_window):
-    x = Conv1D(32, 5, activation="relu", padding="same")(input_window) # 20 dims
-    x = MaxPooling1D(2, padding="same")(x) # 10 dims
+    x = Conv1D(32, 5, activation="relu", padding="same")(input_window) #dim = 20
+    x = MaxPooling1D(2, padding="same")(x) #dim = 10
     
-    #x = Conv1D(32, 5, activation="relu", padding="same")(x) # 10 dims
-    #x = MaxPooling1D(3, padding="same")(x) # 5 dims
-
-    x = Conv1D(1, 5, activation="relu", padding="same")(x) # 5 dims
-    encoded = MaxPooling1D(2, padding="same")(x) # 3 dims
+    x = Conv1D(1, 5, activation="relu", padding="same")(x) #dim = 5
+    encoded = MaxPooling1D(2, padding="same")(x) #dim = 5
 
     return encoded
 
 
 def decoder(encoded):
     
-    x = UpSampling1D(2)(encoded) # 6 dims
-    x = Conv1D(32, 5, activation="relu", padding="same")(x) # 3 dims
-    #x = UpSampling1D(3)(x) # 6 dims
+    x = UpSampling1D(2)(encoded) #dim = 5
+    x = Conv1D(32, 5, activation="relu", padding="same")(x) #dim = 5
     
-    #x = Conv1D(32, 5, activation='relu')(x) # 5 dims
-    x = UpSampling1D(2)(x) # 10 dims
     
-    #x = Conv1D(32, 5, activation='relu')(x) # 20 dims
-
-    decoded = Conv1D(1, 5, activation='sigmoid', padding='same')(x) # 10 dims
+    x = UpSampling1D(2)(x) #dim = 20
+    decoded = Conv1D(1, 5, activation='sigmoid', padding='same')(x) #dim = 20
     
     return decoded
 
@@ -101,6 +94,7 @@ if output_queryset_path == '':
 df = pd.read_csv(dataset_path, '\t', header=None)
 qf = pd.read_csv(queryset_path, '\t', header=None)
 
+#Using 80% of each time-series for training and 20% for test 
 split_num = int((0.8 * (df.shape[1]-1)))
 
 training_sets = []
@@ -125,7 +119,7 @@ for sett in training_sets:
     training_set_scaled = np.asarray(training_set_scaled).astype('float32')
 
     sc = MinMaxScaler(feature_range = (0, 1))
-    # Creating a data structure with 60 time-steps and 1 output
+    #Creating the feature arrays using window length.
     training_set_scaled = sc.fit_transform(training_set_scaled)
 
     scalers.append(sc)
@@ -136,7 +130,7 @@ for sett in training_sets:
     for i in range(0, len(training_set_scaled), window_length):
         X_train.append(training_set_scaled[i:(i + window_length)])
     
-    if len(X_train[-1]) != window_length:
+    if len(X_train[-1]) != window_length: #Drop the last batch if size doesn't fit
         del X_train[-1]
 
     X_train, y_train = np.array(X_train), np.array(y_train)
@@ -271,18 +265,20 @@ with open(output_dataset_path, 'w', encoding='UTF8') as f:
 
         reduced_stock = []
 
-        i = 0
-        encoded_stock = encoder.predict(dset)
+        encoded_stock = encoder.predict(dset) #Get reduced representation.
+        
+        #Used for output
         columns = df.shape[1]-1
         latent_dim = encoded_stock[0].shape[0]
 
-        for iterator in range(len(encoded_stock)):
+        for iterator in range(len(encoded_stock)): #Pick up the pieces.
             slc = sc.inverse_transform(encoded_stock[iterator])
             for item in slc:
                 reduced_stock.append(item)
     
-        reduced_stock = [item for sublist in reduced_stock for item in sublist]
+        reduced_stock = [item for sublist in reduced_stock for item in sublist] #One final array.
         
+        #Write out to csv
         row_str = []
         id = name
         row_str.append(id)
@@ -317,4 +313,5 @@ with open(output_queryset_path, 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
         writer.writerow(row_str) 
 
+print('Successfully written out reduced data to specified files.')
 print('The number of reduced columns will be: ' + str( int(columns/window_length) * latent_dim) )

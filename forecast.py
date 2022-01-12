@@ -61,17 +61,20 @@ if graphs_n > n:
 
 df = pd.read_csv(dataset, '\t', header=None)
 
+#Select time series at random
 df_rand = random.sample(range(df.shape[0]), n) 
 
+#Using 80% of each time-series for training and 20% for test 
 split_num = int((0.8 * (df.shape[1]-1)))
 
+#Create sets
 training_sets = []
 test_sets = []
 input_sets = []
 names = []
 for i in df_rand:
 
-    if total == False:
+    if total == False:#Use only the randomly selected series for training per series.
         training_sets.append(df.iloc[i , 1:split_num+1].values)
 
     names.append(df.iloc[i,0])
@@ -80,7 +83,7 @@ for i in df_rand:
 
     input_sets.append(df.iloc[i, 0+(df.shape[1] - len(test_set) - time_steps) :].values) 
 
-
+#Use all of the series for training per total.
 if total == True:
    for i in range(df.shape[0]):
        training_sets.append(df.iloc[i , 1:split_num+1].values)
@@ -89,14 +92,14 @@ if total == True:
 
 #/-----------------------Chapter: Defining feature arrays----------------------/
 
-scalers = []
+scalers = []#Use a list that stores the scalers, so they may be reused for the test sets and the inverse transformations.
 
 X_trains = []
 y_trains = []
 for sett in training_sets:
     
     sc = StandardScaler()
-    # Creating a data structure with 60 time-steps and 1 output
+    #Creating the feature arrays with 50 time steps and 1 output.
     training_set_scaled = np.reshape(sett, (-1,1)) 
     training_set_scaled = sc.fit_transform(training_set_scaled)
 
@@ -145,21 +148,21 @@ test_losses = []
 pred_prices = []
 if total == False:
 
-    for (x,y,test,sc, test_og) in zip(X_trains, y_trains, X_tests,scalers, test_sets):
+    for (x,y,test,sc, test_original) in zip(X_trains, y_trains, X_tests,scalers, test_sets):
     
         K.clear_session()
-        model = Sequential()#Adding the first LSTM layer and some Dropout regularisation
+        model = Sequential()#Adding the first LSTM layer and Dropout
         model.add(LSTM(units = 64, return_sequences = True, input_shape = (X_trains[0].shape[1], 1)))
-        model.add(Dropout(0.7))# Adding a second LSTM layer and some Dropout regularisation
+        model.add(Dropout(0.7))#Adding a new layer
         model.add(LSTM(units = 64, return_sequences = True))
-        model.add(Dropout(0.7))# Adding a third LSTM layer and some Dropout regularisation
+        model.add(Dropout(0.7))#Adding a new layer
         model.add(LSTM(units = 64, return_sequences = True))
-        model.add(Dropout(0.7))# Adding a fourth LSTM layer and some Dropout regularisation
+        model.add(Dropout(0.7))#Adding the final layer
         model.add(LSTM(units = 64))
-        model.add(Dropout(0.7))# Adding the output layer
+        model.add(Dropout(0.7))#Adding the output layer
         model.add(Dense(units = 1))
         
-        #Compiling the RNN
+        #Compiling
         model.compile(optimizer = 'adam', loss = 'mean_squared_error')
         hist = model.fit(x, y, epochs = 7, batch_size = 128, validation_split=0.1)
         print()
@@ -168,7 +171,7 @@ if total == False:
 
         pred_price = model.predict(test)
         pred_price = sc.inverse_transform(pred_price)
-        test_mae_loss = np.mean(np.abs(pred_price - test_og), axis=1)
+        test_mae_loss = np.mean(np.abs(pred_price - test_original), axis=1)
         test_losses.append(test_mae_loss)
 
         pred_prices.append(pred_price)
@@ -176,11 +179,11 @@ if total == False:
 else:
 
     if predict == False:
-        model = Sequential()#Adding the first LSTM layer and some Dropout regularisation
+        model = Sequential()
         model.add(LSTM(units = 64, return_sequences = True, input_shape = (X_train_big.shape[1], 1)))
-        model.add(Dropout(0.5))# Adding a second LSTM layer and some Dropout regularisation
+        model.add(Dropout(0.5))
         model.add(LSTM(units = 64))
-        model.add(Dropout(0.5))# Adding the output layer
+        model.add(Dropout(0.5))
         model.add(Dense(units = 1))
         model.compile(optimizer = 'adam', loss = 'mean_squared_error')
         hist = model.fit(X_train_big, y_train_big, epochs = 5, batch_size = 512, validation_split=0.1)    
@@ -191,10 +194,10 @@ else:
     
     model = tf.keras.models.load_model('forecast_model.h5')
 
-    for (test,sc,test_og) in zip(X_tests,scalers,test_sets):
+    for (test,sc,test_original) in zip(X_tests,scalers,test_sets):
         pred_price = model.predict(test)
         pred_price = sc.inverse_transform(pred_price)
-        test_mae_loss = np.mean(np.abs(pred_price - test_og), axis=1)
+        test_mae_loss = np.mean(np.abs(pred_price - test_original), axis=1)
         test_losses.append(test_mae_loss)
 
         pred_prices.append(pred_price)
@@ -206,11 +209,9 @@ print("The average loss of the test sets is ", np.mean(test_losses))
 
 #/------------------------------Chapter: Graphs-------------------------------/
 
-# Visualising the results
-
 random_stock = random.choice(range(n))
 
-if graphs_all == False:
+if graphs_all == False: #Plot a random stock if no argument provided.
     name = names[random_stock]
     plt.figure()
     plt.plot(range(split_num,df.shape[1]-1),test_sets[random_stock], color = 'red', label = 'True ' + name)

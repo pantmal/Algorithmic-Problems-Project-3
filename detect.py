@@ -66,7 +66,7 @@ if graphs_n > n:
 
 df = pd.read_csv(dataset, '\t', header=None)
 
-split_num = int((0.8 * (df.shape[0]-1)))
+split_num = int((0.8 * (df.shape[0]-1))) #Using 80% of the dataset as train and 20% as test sets.
 t_num = df.shape[0] - split_num
 
 names = []
@@ -96,7 +96,7 @@ X_trains = []
 y_trains = []
 for sett in training_sets:
     training_set_scaled = np.reshape(sett, (-1,1)) 
-    # Creating a data structure with 60 time-steps and 1 output
+    #Creating the feature arrays with 50 time steps and 1 output.
     sc = StandardScaler()
     training_set_scaled = sc.fit_transform(training_set_scaled)
 
@@ -151,7 +151,7 @@ if predict == False:
     model.compile(optimizer='adam', loss='mae')
     model.summary()
 
-    #Compiling the model
+    #Compiling
     hist = model.fit(X_train_big, y_train_big, epochs=5, batch_size=512, validation_split=0.1, shuffle=False)
     val_losses.append(np.mean(hist.history['val_loss']))
     model.save('detect_model.h5')
@@ -183,7 +183,7 @@ random_stock = random.choice(range(n))
 
 threshold = mae
 
-if graphs_all == False:
+if graphs_all == False: #Plot a random stock if no argument provided.
     
     test_score_df = pd.DataFrame(test_sets[random_stock][time_steps:])
     test_score_df['loss'] = test_losses[random_stock]
@@ -199,7 +199,7 @@ if graphs_all == False:
 
     test_score_df['date'] = x
 
-    if loss_plot:
+    if loss_plot: #Optionally plot the test loss v. threshold
 
         plt.subplot(2, 1, 1)
         plt.plot(x,test_score_df['loss'], color = 'blue', label = 'Test loss of ' + names[random_stock])
