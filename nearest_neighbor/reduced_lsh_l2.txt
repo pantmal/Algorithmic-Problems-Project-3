@@ -1,0 +1,66 @@
+Algorithm: LSH_Vector 
+
+Query: x
+Approximate Nearest neighbor-1: rig
+True Nearest neighbor-1: rig
+distanceApproximate: 122.627
+distanceTrue: 122.627
+
+Query: xel
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: t
+distanceApproximate: 26.5295
+distanceTrue: 26.5295
+
+Query: xl
+Approximate Nearest neighbor-1: kbh
+True Nearest neighbor-1: kbh
+distanceApproximate: 104.361
+distanceTrue: 104.361
+
+Query: xlnx
+Approximate Nearest neighbor-1: msft
+True Nearest neighbor-1: msft
+distanceApproximate: 41.367
+distanceTrue: 41.367
+
+Query: xom
+Approximate Nearest neighbor-1: cvx
+True Nearest neighbor-1: cvx
+distanceApproximate: 82.9519
+distanceTrue: 82.9519
+
+Query: xray
+Approximate Nearest neighbor-1: cpb
+True Nearest neighbor-1: cpb
+distanceApproximate: 34.9911
+distanceTrue: 34.9911
+
+Query: xrx
+Approximate Nearest neighbor-1: bk
+True Nearest neighbor-1: bk
+distanceApproximate: 88.4701
+distanceTrue: 88.4701
+
+Query: yum
+Approximate Nearest neighbor-1: wec
+True Nearest neighbor-1: wec
+distanceApproximate: 52.8074
+distanceTrue: 52.8074
+
+Query: zbh
+Approximate Nearest neighbor-1: ups
+True Nearest neighbor-1: ups
+distanceApproximate: 75.4499
+distanceTrue: 75.4499
+
+Query: zion
+Approximate Nearest neighbor-1: sti
+True Nearest neighbor-1: sti
+distanceApproximate: 52.4576
+distanceTrue: 52.4576
+
+tApproximateAverage = 0.00382577[s]
+tTrueAverage = 0.00835304[s]
+
+MAF = 1

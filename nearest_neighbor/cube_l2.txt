@@ -1,0 +1,66 @@
+Algorithm: Hypercube 
+
+Query: x
+Approximate Nearest neighbor-1: rig
+True Nearest neighbor-1: rig
+distanceApproximate: 948.216
+distanceTrue: 948.216
+
+Query: xel
+Approximate Nearest neighbor-1: cce
+True Nearest neighbor-1: t
+distanceApproximate: 214.57
+distanceTrue: 211.418
+
+Query: xl
+Approximate Nearest neighbor-1: aa
+True Nearest neighbor-1: sti
+distanceApproximate: 871.895
+distanceTrue: 561.222
+
+Query: xlnx
+Approximate Nearest neighbor-1: ip
+True Nearest neighbor-1: snps
+distanceApproximate: 355.355
+distanceTrue: 307.226
+
+Query: xom
+Approximate Nearest neighbor-1: epc
+True Nearest neighbor-1: slb
+distanceApproximate: 746.554
+distanceTrue: 586.457
+
+Query: xray
+Approximate Nearest neighbor-1: teva
+True Nearest neighbor-1: pcg
+distanceApproximate: 688.775
+distanceTrue: 274.728
+
+Query: xrx
+Approximate Nearest neighbor-1: lnc
+True Nearest neighbor-1: kss
+distanceApproximate: 728.427
+distanceTrue: 627.702
+
+Query: yum
+Approximate Nearest neighbor-1: gis
+True Nearest neighbor-1: gis
+distanceApproximate: 403.546
+distanceTrue: 403.546
+
+Query: zbh
+Approximate Nearest neighbor-1: ups
+True Nearest neighbor-1: ups
+distanceApproximate: 669.383
+distanceTrue: 669.383
+
+Query: zion
+Approximate Nearest neighbor-1: snv
+True Nearest neighbor-1: sti
+distanceApproximate: 634.215
+distanceTrue: 445.729
+
+tApproximateAverage = 0.00227437[s]
+tTrueAverage = 0.0391139[s]
+
+MAF = 2.50711

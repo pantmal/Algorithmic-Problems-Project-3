@@ -1,0 +1,66 @@
+Algorithm: LSH_Frechet_Discrete 
+
+Query: x
+Approximate Nearest neighbor-1: pld
+True Nearest neighbor-1: bb
+distanceApproximate: 66.7885
+distanceTrue: 52.6946
+
+Query: xel
+Approximate Nearest neighbor-1: unm
+True Nearest neighbor-1: cms
+distanceApproximate: 13.4921
+distanceTrue: 7.2957
+
+Query: xl
+Approximate Nearest neighbor-1: mbi
+True Nearest neighbor-1: sti
+distanceApproximate: 35.9909
+distanceTrue: 34.366
+
+Query: xlnx
+Approximate Nearest neighbor-1: msft
+True Nearest neighbor-1: a
+distanceApproximate: 16.125
+distanceTrue: 14.166
+
+Query: xom
+Approximate Nearest neighbor-1: ntrs
+True Nearest neighbor-1: pg
+distanceApproximate: 34.882
+distanceTrue: 24.085
+
+Query: xray
+Approximate Nearest neighbor-1: k
+True Nearest neighbor-1: pcg
+distanceApproximate: 21.1656
+distanceTrue: 15.8576
+
+Query: xrx
+Approximate Nearest neighbor-1: sti
+True Nearest neighbor-1: kss
+distanceApproximate: 31.3758
+distanceTrue: 22.7972
+
+Query: yum
+Approximate Nearest neighbor-1: rost
+True Nearest neighbor-1: tmk
+distanceApproximate: 23.6192
+distanceTrue: 16.6603
+
+Query: zbh
+Approximate Nearest neighbor-1: pep
+True Nearest neighbor-1: ups
+distanceApproximate: 40.0476
+distanceTrue: 28.055
+
+Query: zion
+Approximate Nearest neighbor-1: cinf
+True Nearest neighbor-1: sti
+distanceApproximate: 50.554
+distanceTrue: 16.953
+
+tApproximateAverage = 4.4275[s]
+tTrueAverage = 38.9373[s]
+
+MAF = 2.98201

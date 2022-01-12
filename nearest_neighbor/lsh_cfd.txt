@@ -1,0 +1,66 @@
+Algorithm: LSH_Frechet_Continuous 
+
+Query: x
+Approximate Nearest neighbor-1: dds
+True Nearest neighbor-1: bb
+distanceApproximate: 41.47
+distanceTrue: 33.04
+
+Query: xel
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: orcl
+distanceApproximate: 6.1329
+distanceTrue: 4.66061
+
+Query: xl
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: snv
+distanceApproximate: 6.1329
+distanceTrue: 15.259
+
+Query: xlnx
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: eqr
+distanceApproximate: 6.1329
+distanceTrue: 5.249
+
+Query: xom
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: dov
+distanceApproximate: 6.1329
+distanceTrue: 12.8249
+
+Query: xray
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: pcg
+distanceApproximate: 6.1329
+distanceTrue: 8.63
+
+Query: xrx
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: fe
+distanceApproximate: 6.1329
+distanceTrue: 12.0024
+
+Query: yum
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: tmk
+distanceApproximate: 6.1329
+distanceTrue: 8.011
+
+Query: zbh
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: ups
+distanceApproximate: 6.1329
+distanceTrue: 17.0668
+
+Query: zion
+Approximate Nearest neighbor-1: cms
+True Nearest neighbor-1: sti
+distanceApproximate: 6.1329
+distanceTrue: 12.86
+
+tApproximateAverage = 6.43142[s]
+tTrueAverage = 219.774[s]
+
+MAF = 1.3159

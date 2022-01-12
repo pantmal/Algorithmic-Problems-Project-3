@@ -1,0 +1,66 @@
+Algorithm: LSH_Frechet_Continuous 
+
+Query: x
+Approximate Nearest neighbor-1: trow
+True Nearest neighbor-1: bb
+distanceApproximate: 24.3017
+distanceTrue: 11.0421
+
+Query: xel
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: orcl
+distanceApproximate: 4.54045
+distanceTrue: 2.13759
+
+Query: xl
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: nav
+distanceApproximate: 4.54045
+distanceTrue: 4.22637
+
+Query: xlnx
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: ccl
+distanceApproximate: 4.54045
+distanceTrue: 2.09602
+
+Query: xom
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: dgx
+distanceApproximate: 4.54045
+distanceTrue: 4.02542
+
+Query: xray
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: gis
+distanceApproximate: 4.54045
+distanceTrue: 2.47802
+
+Query: xrx
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: nem
+distanceApproximate: 4.54045
+distanceTrue: 2.372
+
+Query: yum
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: pki
+distanceApproximate: 4.54045
+distanceTrue: 2.53305
+
+Query: zbh
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: pep
+distanceApproximate: 4.54045
+distanceTrue: 4.4454
+
+Query: zion
+Approximate Nearest neighbor-1: t
+True Nearest neighbor-1: hig
+distanceApproximate: 4.54045
+distanceTrue: 3.59868
+
+tApproximateAverage = 5.04587[s]
+tTrueAverage = 253.047[s]
+
+MAF = 2.20083
